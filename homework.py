@@ -126,7 +126,7 @@ def check_response(response):
     """Возврат статуса домашней работы."""
     if 'code' in response:
         raise ServiceError(SERVICE_REJECTION.format(
-            code = response.get('code'),
+            code=response.get('code'),
         ))
     if response['homeworks']:
         return response['homeworks'][0]
