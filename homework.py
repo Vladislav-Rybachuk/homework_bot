@@ -87,7 +87,7 @@ logging.basicConfig(
 
 
 def send_message(bot, message):
-    """ Отправка сообщения пользователю в Telegram"""
+    """Отправка сообщения пользователю в Telegram."""
     try:
         bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
     except Exception as error:
@@ -99,12 +99,12 @@ def send_message(bot, message):
 
 
 def get_api_answer(current_timestamp):
-    """"Отправка запроса к API"""
+    """Отправка запроса к API."""
     timestamp = current_timestamp or int(time.time())
     params = {'from_date': timestamp}
     all_params = dict(url=ENDPOINT, headers=HEADERS, params=params)
     try:
-        response =requests.get(**all_params)
+        response = requests.get(**all_params)
     except requests.exceptions.RequestException as error:
         raise telegram.TelegramError(CONNECTION_ERROR.format(
             error=error,
@@ -123,25 +123,24 @@ def get_api_answer(current_timestamp):
 
 
 def check_response(response):
-     """Возврат статуса домашней работы"""
-     if 'code' in response:
+    """Возврат статуса домашней работы."""
+    if 'code' in response:
         raise ServiceError(SERVICE_REJECTION.format(
-            code =response.get('code'),
+            code = response.get('code'),
         ))
-     if response['homeworks']:
+    if response['homeworks']:
         return response['homeworks'][0]
-     else:
+    else:
         raise IndexError(LIST_IS_EMPTY)
 
 
 def parse_status(homework):
-    """Проверка статуса ответа API"""
-
+    """Проверка статуса ответа API."""
     if not isinstance(homework, dict):
         raise DataTypeError(WRONG_DATA_TYPE.format(type(homework)))
     homework_name = homework.get('homework_name')
     homework_status = homework.get('status')
-    
+
     if homework_status not in HOMEWORK_STATUSES:
         raise NameError(WRONG_HOMEWORK_STATUS.format(homework_status))
 
@@ -151,7 +150,7 @@ def parse_status(homework):
 
 
 def check_tokens():
-    """Проверка доступности переменных окружения"""
+    """Проверка доступности переменных окружения."""
     for key in (PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID, ENDPOINT):
         if key is None:
             logging.error(GLOBAL_VARIABLE_IS_MISSING)
