@@ -63,6 +63,7 @@ SERVICE_REJECTION = '{code}'
 WRONG_ENDPOINT = '{response_status}, {url}, {headers}, {params}'
 WRONG_HOMEWORK_STATUS = '{homework_status}'
 WRONG_DATA_TYPE = 'Неверный тип данных {type}, вместо "dict"'
+WRONG_DATA_TYPE_LIST= 'Неверный тип данных {type}, вместо "list"'
 STATUS_IS_CHANGED = '{verdict}, {homework}'
 STATUS_IS_NOT_CHANGED = 'Статус не изменился, нет записей'
 FAILURE_TO_SEND_MESSAGE = '{error}, {message}'
@@ -72,6 +73,7 @@ MESSAGE_IS_SENT = 'Сообщение {message} отправлено'
 FORMAT_NOT_JSON = 'Формат не json {error}'
 LIST_IS_EMPTY = 'Список пустой'
 NO_HOMEWORK_NAME_KEY = 'В ответе API домашки отсутсвует ключ _homework_name_'
+NO_HOMEWORKS_KEY = ' В ответе API домашки отсутствует ключ _homeworks'
 
 PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN')
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
@@ -137,6 +139,10 @@ def check_response(response):
         ))
     if response['homeworks']:
         return response['homeworks'][0]
+    if 'homeworks' not in response.get():
+        raise ResponseContentError(NO_HOMEWORKS_KEY)
+    if response.get('homeworks') is not list:
+        raise TypeError(WRONG_DATA_TYPE_LIST)
     else:
         raise IndexError(LIST_IS_EMPTY)
 
