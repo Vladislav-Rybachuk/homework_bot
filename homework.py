@@ -51,9 +51,10 @@ class ResponseFormatError(Exception):
 
     pass
 
+
 class ResponseContentError(Exception):
-    """ Ошибка, если содежимое отклика некорректно."""
-    
+    """Ошибка, если содежимое отклика некорректно."""
+
     pass
 
 
