@@ -140,7 +140,7 @@ def check_response(response):
     if response['homeworks']:
         return response['homeworks'][0]
 
-    if 'homeworks' not in response.get('homeworks'):
+    if 'homeworks' not in response.keys():
         raise ResponseContentError(NO_HOMEWORKS_KEY)
 
     if not isinstance(response.get('homework'), list):
