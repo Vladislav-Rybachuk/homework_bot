@@ -51,6 +51,11 @@ class ResponseFormatError(Exception):
 
     pass
 
+class ResponseContentError(Exception):
+    """ Ошибка, если содежимое отклика некорректно."""
+    
+    pass
+
 
 CONNECTION_ERROR = '{error}, {url}, {headers}, {params}'
 SERVICE_REJECTION = '{code}'
@@ -65,6 +70,7 @@ GLOBAL_VARIABLE_IS_EMPTY = 'Пустая глобальная переменна
 MESSAGE_IS_SENT = 'Сообщение {message} отправлено'
 FORMAT_NOT_JSON = 'Формат не json {error}'
 LIST_IS_EMPTY = 'Список пустой'
+NO_HOMEWORK_NAME_KEY = 'В ответе API домашки отсутсвует ключ _homework_name_'
 
 PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN')
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
@@ -143,6 +149,9 @@ def parse_status(homework):
 
     if homework_status not in HOMEWORK_VERDICTS:
         raise NameError(WRONG_HOMEWORK_STATUS.format(homework_status))
+
+    if homework_name is None:
+        raise ResponseContentError(NO_HOMEWORK_NAME_KEY.format(homework_name))
 
     verdict = HOMEWORK_VERDICTS[homework_status]
 
