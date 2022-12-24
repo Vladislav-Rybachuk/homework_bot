@@ -70,7 +70,7 @@ PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN')
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
-RETRY_TIME = 600
+RETRY_PERIOD = 600
 ENDPOINT = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
 HEADERS = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
 
@@ -146,7 +146,7 @@ def parse_status(homework):
 
     verdict = HOMEWORK_STATUSES[homework_status]
 
-    return f'Изменился статус Вашей работы "{homework_name}".{verdict}'
+    return f'Изменился статус Вашей работы "{homework_name}". {verdict}'
 
 
 def check_tokens():
@@ -184,7 +184,7 @@ def main():
             message = f'Сбой в работе программы:{error}'
             send_message(bot, message)
         finally:
-            time.sleep(RETRY_TIME)
+            time.sleep(RETRY_PERIOD)
         logging.info(MESSAGE_IS_SENT.format(message))
 
 
