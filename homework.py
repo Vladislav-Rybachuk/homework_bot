@@ -146,7 +146,7 @@ def parse_status(homework):
 
     verdict = HOMEWORK_VERDICTS[homework_status]
 
-    return f'Изменился статус Вашей работы "{homework_name}". {verdict}'
+    return f'Изменился статус проверки работы "{homework_name}". {verdict}'
 
 
 def check_tokens():
