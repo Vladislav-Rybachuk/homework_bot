@@ -96,6 +96,7 @@ def send_message(bot, message):
     try:
         bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
     except Exception as error:
+        logging.error('Ошибка отправки сообщения')
         raise MessageSendingError(FAILURE_TO_SEND_MESSAGE.format(
             error=error,
             message=message,
