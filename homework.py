@@ -90,10 +90,6 @@ HOMEWORK_VERDICTS = {
     'rejected': 'Работа проверена: у ревьюера есть замечания.'
 }
 
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO)
-
 
 def send_message(bot, message):
     """Отправка сообщения пользователю в Telegram."""
@@ -104,7 +100,7 @@ def send_message(bot, message):
             error=error,
             message=message,
         ))
-    logging.info(f'Message "{message}" is sent')
+    logging.debug(f'Message "{message}" is sent')
 
 
 def get_api_answer(current_timestamp):
@@ -172,10 +168,10 @@ def check_tokens():
     """Проверка доступности переменных окружения."""
     for key in (PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID, ENDPOINT):
         if key is None:
-            logging.error(GLOBAL_VARIABLE_IS_MISSING)
+            logging.critical(GLOBAL_VARIABLE_IS_MISSING)
             return False
         if not key:
-            logging.error(GLOBAL_VARIABLE_IS_EMPTY)
+            logging.critical(GLOBAL_VARIABLE_IS_EMPTY)
             return False
     return True
 
