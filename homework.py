@@ -144,7 +144,7 @@ def check_response(response):
     if response['homeworks']:
         return response['homeworks'][0]
 
-    if not isinstance(response.json(), dict):
+    if not isinstance(response.data, dict):
         raise TypeError(WRONG_DATA_TYPE)
 
     else:
