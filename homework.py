@@ -139,7 +139,7 @@ def check_response(response):
 
     if not isinstance(response.get('homeworks'), list):
         raise TypeError(WRONG_DATA_TYPE_LIST)
-    
+
     if response['homeworks']:
         return response['homeworks'][0]
 
