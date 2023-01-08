@@ -133,15 +133,15 @@ def check_response(response):
     if 'code' in response:
         raise ServiceError(SERVICE_REJECTION.format(
             code=response.get('code'),
-        ))        
+        ))
     if 'homeworks' not in response.keys():
         raise ResponseContentError(NO_HOMEWORKS_KEY)
 
-    if response['homeworks']:
-        return response['homeworks'][0]
-
     if not isinstance(response.get('homeworks'), list):
         raise TypeError(WRONG_DATA_TYPE_LIST)
+    
+    if response['homeworks']:
+        return response['homeworks'][0]
 
     else:
         raise IndexError(LIST_IS_EMPTY)
