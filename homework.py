@@ -130,9 +130,6 @@ def get_api_answer(current_timestamp):
 
 def check_response(response):
     """Возврат статуса домашней работы."""
-    if not isinstance(response.json(), dict):
-        raise TypeError(WRONG_DATA_TYPE)
-
     if 'code' in response:
         raise ServiceError(SERVICE_REJECTION.format(
             code=response.get('code'),
@@ -146,6 +143,9 @@ def check_response(response):
 
     if response['homeworks']:
         return response['homeworks'][0]
+
+    if not isinstance(response.json(), dict):
+        raise TypeError(WRONG_DATA_TYPE)
 
     else:
         raise IndexError(LIST_IS_EMPTY)
