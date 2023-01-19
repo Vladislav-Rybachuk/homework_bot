@@ -9,9 +9,8 @@ import telegram
 import requests
 from dotenv import load_dotenv
 
-from exceptions import MessageSendingError,EndpointError,\
-    ResponseFormatError,ServiceError, DataTypeError, ResponseContentError
-
+from exceptions import MessageSendingError, EndpointError,\
+    ResponseFormatError, ServiceError, DataTypeError, ResponseContentError
 
 
 load_dotenv()
