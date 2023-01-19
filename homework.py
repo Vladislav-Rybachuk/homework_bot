@@ -2,78 +2,17 @@ import logging
 import os
 from pathlib import Path
 import time
+from http import HTTPStatus
+import sys
 
 import telegram
 import requests
 from dotenv import load_dotenv
 
+from exceptions import *
+
 load_dotenv()
 
-
-class ServiceError(Exception):
-    """Ошибка отсутствия доступа по заданному эндпойнту."""
-
-    pass
-
-
-class NetworkError(Exception):
-    """Ошибка отсутствия сети."""
-
-    pass
-
-
-class EndpointError(Exception):
-    """Ошибка, если эндпойнт не корректен."""
-
-    pass
-
-
-class MessageSendingError(Exception):
-    """Ошибка отправки сообщения."""
-
-    pass
-
-
-class GlobalsError(Exception):
-    """Ошибка, если есть пустые глобальные переменные."""
-
-    pass
-
-
-class DataTypeError(Exception):
-    """Ошибка, если тип данных не dict."""
-
-    pass
-
-
-class ResponseFormatError(Exception):
-    """Ошибка, если формат response не json."""
-
-    pass
-
-
-class ResponseContentError(Exception):
-    """Ошибка, если содежимое отклика некорректно."""
-
-    pass
-
-
-CONNECTION_ERROR = '{error}, {url}, {headers}, {params}'
-SERVICE_REJECTION = '{code}'
-WRONG_ENDPOINT = '{response_status}, {url}, {headers}, {params}'
-WRONG_HOMEWORK_STATUS = '{homework_status}'
-WRONG_DATA_TYPE = 'Неверный тип данных {type}, вместо "dict"'
-WRONG_DATA_TYPE_LIST = 'Неверный тип данных {type}, вместо "list"'
-STATUS_IS_CHANGED = '{verdict}, {homework}'
-STATUS_IS_NOT_CHANGED = 'Статус не изменился, нет записей'
-FAILURE_TO_SEND_MESSAGE = '{error}, {message}'
-GLOBAL_VARIABLE_IS_MISSING = 'Отсутствует глобальная переменная'
-GLOBAL_VARIABLE_IS_EMPTY = 'Пустая глобальная переменная'
-MESSAGE_IS_SENT = 'Сообщение {message} отправлено'
-FORMAT_NOT_JSON = 'Формат не json {error}'
-LIST_IS_EMPTY = 'Список пустой'
-NO_HOMEWORK_NAME_KEY = 'В ответе API домашки отсутсвует ключ _homework_name_'
-NO_HOMEWORKS_KEY = ' В ответе API домашки отсутствует ключ _homeworks'
 
 PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN')
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
@@ -93,6 +32,7 @@ HOMEWORK_VERDICTS = {
 
 def send_message(bot, message):
     """Отправка сообщения пользователю в Telegram."""
+    FAILURE_TO_SEND_MESSAGE = '{error}, {message}'  
     try:
         bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
     except Exception as error:
@@ -106,6 +46,9 @@ def send_message(bot, message):
 
 def get_api_answer(current_timestamp):
     """Отправка запроса к API."""
+    CONNECTION_ERROR = '{error}, {url}, {headers}, {params}'
+    WRONG_ENDPOINT = '{response_status}, {url}, {headers}, {params}'
+    FORMAT_NOT_JSON = 'Формат не json {error}'
     timestamp = current_timestamp or int(time.time())
     params = {'from_date': timestamp}
     all_params = dict(url=ENDPOINT, headers=HEADERS, params=params)
@@ -117,7 +60,7 @@ def get_api_answer(current_timestamp):
             **all_params,
         ))
     response_status = response.status_code
-    if response_status != 200:
+    if response_status != HTTPStatus.OK:
         raise EndpointError(WRONG_ENDPOINT.format(
             response_status=response_status,
             **all_params,
@@ -130,6 +73,11 @@ def get_api_answer(current_timestamp):
 
 def check_response(response):
     """Возврат статуса домашней работы."""
+    SERVICE_REJECTION = '{code}'
+    WRONG_DATA_TYPE = 'Неверный тип данных {type}, вместо "dict"'
+    WRONG_DATA_TYPE_LIST = 'Неверный тип данных {type}, вместо "list"'
+    LIST_IS_EMPTY = 'Список пустой'
+    NO_HOMEWORKS_KEY = ' В ответе API домашки отсутствует ключ _homeworks'
     if not isinstance(response, dict):
         raise TypeError(WRONG_DATA_TYPE)
 
@@ -153,6 +101,9 @@ def check_response(response):
 
 def parse_status(homework):
     """Проверка статуса ответа API."""
+    WRONG_HOMEWORK_STATUS = '{homework_status}'
+    WRONG_DATA_TYPE = 'Неверный тип данных {type}, вместо "dict"'
+    NO_HOMEWORK_NAME_KEY = 'В ответе API домашки отсутсвует ключ _homework_name_'
     if not isinstance(homework, dict):
         raise DataTypeError(WRONG_DATA_TYPE.format(type(homework)))
     homework_name = homework.get('homework_name')
@@ -171,20 +122,20 @@ def parse_status(homework):
 
 def check_tokens():
     """Проверка доступности переменных окружения."""
-    for key in (PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID, ENDPOINT):
-        if key is None:
-            logging.critical(GLOBAL_VARIABLE_IS_MISSING)
-            return False
-        if not key:
-            logging.critical(GLOBAL_VARIABLE_IS_EMPTY)
-            return False
-    return True
-
+    GLOBAL_VARIABLE_IS_MISSING = 'Отсутствует глобальная переменная'
+    TOKENS = (PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID, ENDPOINT)
+    if  not all(TOKENS):
+        logging.critical(GLOBAL_VARIABLE_IS_MISSING)
+        return False
+    else:
+        return True
+        
 
 def main():
     """Основная логика работы бота."""
+    MESSAGE_IS_SENT = 'Сообщение {message} отправлено'
     if not check_tokens():
-        raise GlobalsError('Ошибка глобальной переменной.См. логи')
+        sys.exit('Ошибка глобальной переменной.См. логи')
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     current_timestamp = int(time.time())
 
