@@ -9,7 +9,10 @@ import telegram
 import requests
 from dotenv import load_dotenv
 
-from exceptions import *
+from exceptions import MessageSendingError,EndpointError,\
+    ResponseFormatError,ServiceError, DataTypeError, ResponseContentError
+
+
 
 load_dotenv()
 
@@ -32,7 +35,7 @@ HOMEWORK_VERDICTS = {
 
 def send_message(bot, message):
     """Отправка сообщения пользователю в Telegram."""
-    FAILURE_TO_SEND_MESSAGE = '{error}, {message}'  
+    FAILURE_TO_SEND_MESSAGE = '{error}, {message}'
     try:
         bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
     except Exception as error:
@@ -103,7 +106,7 @@ def parse_status(homework):
     """Проверка статуса ответа API."""
     WRONG_HOMEWORK_STATUS = '{homework_status}'
     WRONG_DATA_TYPE = 'Неверный тип данных {type}, вместо "dict"'
-    NO_HOMEWORK_NAME_KEY = 'В ответе API домашки отсутсвует ключ _homework_name_'
+    NO_HOMEWORK_NAME_KEY = 'В ответе API отсутсвует ключ _homework_name_'
     if not isinstance(homework, dict):
         raise DataTypeError(WRONG_DATA_TYPE.format(type(homework)))
     homework_name = homework.get('homework_name')
@@ -124,12 +127,12 @@ def check_tokens():
     """Проверка доступности переменных окружения."""
     GLOBAL_VARIABLE_IS_MISSING = 'Отсутствует глобальная переменная'
     TOKENS = (PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID, ENDPOINT)
-    if  not all(TOKENS):
+    if not all(TOKENS):
         logging.critical(GLOBAL_VARIABLE_IS_MISSING)
         return False
     else:
         return True
-        
+
 
 def main():
     """Основная логика работы бота."""
